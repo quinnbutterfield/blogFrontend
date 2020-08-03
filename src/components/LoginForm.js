@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import loginService from './services/login'
 import blogService from './services/blogs'
-
+import propTypes from 'prop-types'
 
 const LoginForm = ({ setUser, showError }) => {
   const [username, setUsername] = useState('')
@@ -40,7 +40,7 @@ const LoginForm = ({ setUser, showError }) => {
       </div>
       <div>
         password
-          <input style={{ marginLeft: '6px' }}
+        <input style={{ marginLeft: '6px' }}
           type="password"
           value={password}
           name="Password"
@@ -52,7 +52,10 @@ const LoginForm = ({ setUser, showError }) => {
   )
 }
 
-
+LoginForm.propTypes = {
+  setUser: propTypes.func.isRequired,
+  showError: propTypes.func.isRequired
+}
 
 
 export default LoginForm

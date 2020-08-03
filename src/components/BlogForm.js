@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import blogService from './services/blogs'
 
 const BlogForm = ({ setBlogs, blogs, showError }) => {
-  
+
 
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
@@ -17,9 +17,7 @@ const BlogForm = ({ setBlogs, blogs, showError }) => {
       url: newUrl,
 
     }
-
-
-
+    console.log(blogObject, 'is blog object')
     blogService
       .create(blogObject)
       .then(returnedBlog => {
@@ -39,7 +37,9 @@ const BlogForm = ({ setBlogs, blogs, showError }) => {
   }
 
   return (
+
     <form onSubmit={addBlog}>
+      <h2>Create a new blog</h2>
       <div>
         Title:
         <input

@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import Blog from './Blog'
+import React, { useState, useEffect, useRef } from 'react'
+
 import blogService from './services/blogs'
 import LoginForm from './LoginForm'
+import Blog from './Blog'
 import BlogForm from './BlogForm'
 import Notification from './Notification'
-
-
-
-
-
+import Toggleable from './Toggleable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
 
+  const blogFormRef = useRef()
+
   const showError = message => {
     setErrorMessage(message)
     setTimeout(() => {
       setErrorMessage(null)
-    }, 5000);
+    }, 5000)
   }
 
   useEffect(() => {
@@ -37,39 +36,71 @@ const App = () => {
     }
   }, [])
 
+  const addLike = blog => {
+    const updatedBlog = { ...blog, likes: blog.likes + 1 }
 
-  
+    blogService
+      .update(updatedBlog)
+      .then(returnedBlog => {
+        setBlogs(blogs
+          .map(b => b.id !== blog.id ? b : returnedBlog))
+      })
+  }
+
+  const removeBlog = blog => {
+    if (window.confirm('Would you like to delete the blog ' + blog.title)) {
+      blogService
+        .deleteBlog(blog)
+        .then(() => {
+          setBlogs(blogs
+            .filter(b => b.id !== blog.id))
+        })
+    }
+
+  }
+
+
+  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
+
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedNoteappUser')
     setUser(null)
   }
 
-  const header = (user === null ? "log in to application" : "Blogs")
+  const header = (user === null
+    ? 'WELCOME TO THE BLOGOSPHERE'
+    : 'Blogs')
   return (
     <div>
 
       <h1>{header}</h1>
       <Notification message={errorMessage} />
       {user === null
-        ? <LoginForm {...{ setUser, showError }} />
+        ?
+        <Toggleable buttonLabel='log in'>
+          <LoginForm {...{ setUser, showError }} />
+        </Toggleable>
         :
         <div>
           <p>{user.name} logged-in
-      <button style={{ marginLeft: '5px' }} onClick={() => handleLogout()}>
+            <button style={{ marginLeft: '5px' }} onClick={() => handleLogout()}>
               logout
-      </button>
+            </button>
 
           </p>
-          <h2>Create a new blog</h2>
-          <BlogForm {...{ setBlogs, blogs, showError }} />
+
+          <Toggleable buttonLabel='new blog' ref={blogFormRef} >
+            <BlogForm {...{ setBlogs, blogs, showError }} />
+          </Toggleable>
           <h2>Current blogs</h2>
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+          {sortedBlogs.map(blog =>
+            // eslint-disable-next-line react/jsx-key
+            <Blog {...{ key: blog.id, blog, addLike, user, removeBlog }} />
           )}
-          
-          
-          
+
+
+
         </div>
       }
 
