@@ -50,7 +50,7 @@ const Blog = ({ blog, addLike, removeBlog, user }) => {
   )
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       {blog.title}
       <button onClick={() => setExpanded(!expanded)}>
         {buttonLabel}
