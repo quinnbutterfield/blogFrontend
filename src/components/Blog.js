@@ -20,24 +20,28 @@ const Blog = ({ blog, addLike, removeBlog, user }) => {
   const buttonLabel = expanded ? 'hide' : 'view'
 
   const showButton = () => {
-    if (blog.user) {
-      return (
-        user.id === blog.user
-          ? <button onClick={() => removeBlog(blog)}>remove</button>
-          : null
-      )
-    }
+
+    return (
+
+      user.id === blog.user
+        ? <button onClick={() => removeBlog(blog)}>remove</button>
+        : null
+    )
+    // }
   }
 
-  const details = (expanded
+  const details = expanded
     ? <div>
       <p>{blog.url}</p>
       <p>
         likes: {blog.likes}
         <button onClick={() => {
-          return addLike(blog)
+          addLike(blog)
+
         }
-        }>like</button>
+        }>
+          like
+        </button>
       </p>
       <p>{blog.author}</p>
       {
@@ -47,12 +51,12 @@ const Blog = ({ blog, addLike, removeBlog, user }) => {
 
     </div>
     : null
-  )
+
 
   return (
     <div style={blogStyle} className='blog'>
       {blog.title}
-      <button onClick={() => setExpanded(!expanded)}>
+      <button className='toggleButton' onClick={() => setExpanded(!expanded)}>
         {buttonLabel}
       </button>
 

@@ -22,8 +22,11 @@ const App = () => {
   }
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
+    blogService.getAll().then(blogs => {
+      let fixedBlogs = blogs.map(b => ({ ...b, user: b.user.id }))
+      setBlogs(fixedBlogs)
+    }
+
     )
   }, [])
 
@@ -38,12 +41,13 @@ const App = () => {
 
   const addLike = blog => {
     const updatedBlog = { ...blog, likes: blog.likes + 1 }
-
     blogService
       .update(updatedBlog)
       .then(returnedBlog => {
         setBlogs(blogs
-          .map(b => b.id !== blog.id ? b : returnedBlog))
+          .map(b => (b.id !== updatedBlog.id ? b : returnedBlog)))
+
+
       })
   }
 
@@ -60,8 +64,7 @@ const App = () => {
   }
 
 
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
-
+  //let sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedNoteappUser')
@@ -94,10 +97,11 @@ const App = () => {
             <BlogForm {...{ setBlogs, blogs, showError }} />
           </Toggleable>
           <h2>Current blogs</h2>
-          {sortedBlogs.map(blog =>
-            // eslint-disable-next-line react/jsx-key
-            <Blog {...{ key: blog.id, blog, addLike, user, removeBlog }} />
-          )}
+          {blogs.sort((a, b) => b.likes - a.likes)
+            .map(blog => {
+              return (<Blog {...{ key: blog.id, blog, addLike, user, removeBlog }} />)
+            }
+            )}
 
 
 
