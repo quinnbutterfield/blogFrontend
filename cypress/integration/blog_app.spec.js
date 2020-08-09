@@ -5,6 +5,7 @@ describe('Blog app', function () {
       name: 'Quinn Butterfield',
       username: 'quinn',
       password: 'password'
+
     }
     cy.request('POST', 'http://localhost:3003/api/users/', user)
     cy.visit('http://localhost:3000')
@@ -12,6 +13,7 @@ describe('Blog app', function () {
   it('Login form is shown', function () {
     cy.contains('log in')
     cy.contains('WELCOME TO THE')
+    
   })
 
   describe('Login', function () {
