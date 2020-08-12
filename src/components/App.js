@@ -99,6 +99,7 @@ const App = () => {
           <h2>Current blogs</h2>
           {blogs.sort((a, b) => b.likes - a.likes)
             .map(blog => {
+              // eslint-disable-next-line react/jsx-key
               return (<Blog {...{ key: blog.id, blog, addLike, user, removeBlog }} />)
             }
             )}
