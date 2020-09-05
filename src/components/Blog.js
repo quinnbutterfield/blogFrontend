@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Blog = ({ blog, addLike, removeBlog, user }) => {
 
@@ -27,7 +28,6 @@ const Blog = ({ blog, addLike, removeBlog, user }) => {
         ? <button onClick={() => removeBlog(blog)}>remove</button>
         : null
     )
-    // }
   }
 
   const details = expanded
@@ -35,11 +35,7 @@ const Blog = ({ blog, addLike, removeBlog, user }) => {
       <p>{blog.url}</p>
       <p>
         likes: {blog.likes}
-        <button onClick={() => {
-          addLike(blog)
-
-        }
-        }>
+        <button onClick={() => addLike(blog)}>
           like
         </button>
       </p>
@@ -55,7 +51,7 @@ const Blog = ({ blog, addLike, removeBlog, user }) => {
 
   return (
     <div style={blogStyle} className='blog'>
-      {blog.title}
+      <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
       <button className='toggleButton' onClick={() => setExpanded(!expanded)}>
         {buttonLabel}
       </button>

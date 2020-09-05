@@ -1,13 +1,22 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import loginService from './services/login'
 import blogService from './services/blogs'
 import propTypes from 'prop-types'
 
-const LoginForm = ({ setUser, showError }) => {
+import { login } from '../reducers/userReducer'
+import { TextField, Button, Box, Grid } from '@material-ui/core'
+
+
+
+const LoginForm = ({ showError }) => {
+
+
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-
+  const dispatch = useDispatch()
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
@@ -19,7 +28,7 @@ const LoginForm = ({ setUser, showError }) => {
         'loggedNoteappUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
-      setUser(user)
+      dispatch(login(user))
 
     } catch (exception) {
       setUsername('')
@@ -29,33 +38,44 @@ const LoginForm = ({ setUser, showError }) => {
   }
   return (
     <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input style={{ marginLeft: '5px' }}
-          id='username'
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input style={{ marginLeft: '6px' }}
-          id='password'
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button id='login-button' type="submit">login</button>
+
+      <Grid container spacing={1} justify='center'>
+
+        <Grid item>
+
+
+          <TextField
+            className='textField'
+            id='username'
+            type='text'
+            value={username}
+            label='Username'
+            color='secondary'
+            variant='outlined'
+            onChange={({ target }) => setUsername(target.value)}
+          />
+        </Grid>
+
+        <Grid item>
+          <TextField
+            id='password'
+            type="password"
+            value={password}
+            label="Password"
+            color='secondary'
+            variant='outlined'
+            onChange={({ target }) => setPassword(target.value)}
+          />
+        </Grid>
+        <Grid item justify='center'>
+          <Button variant='contained' color='secondary' type='submit'>Log In</Button>
+        </Grid>
+      </Grid>
     </form>
   )
 }
 
 LoginForm.propTypes = {
-  setUser: propTypes.func.isRequired,
   showError: propTypes.func.isRequired
 }
 

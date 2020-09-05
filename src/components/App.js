@@ -1,118 +1,140 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
+import Home from './Home'
+import User from './User'
 
+import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import Users from './Users'
+import { login } from '../reducers/userReducer'
+import { initializeBlogs } from '../reducers/blogReducer'
 import blogService from './services/blogs'
-import LoginForm from './LoginForm'
-import Blog from './Blog'
-import BlogForm from './BlogForm'
+import userService from './services/users'
 import Notification from './Notification'
-import Toggleable from './Toggleable'
+import Navbar from './Navbar'
+import BlogDetails from './BlogDetails'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import Container from '@material-ui/core/Container'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import { Grid } from '@material-ui/core'
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      light: '#8ef2ef',
+      main: '#5abfbd',
+      dark: '#1d8e8d',
+      contrastText: '#000'
+    },
+    background: {
+      default: '#5abfbd'
+    },
+    secondary: {
+      light: '#330954',
+      main: '#0b132b',
+      dark: '#000000',
+      contrastText: '#8ef2ef'
+    }
+  },
+  paper: {
+    color: 'red'
+  }
+})
+
+
+
+
+const PrivateComponent = ({ user, component }) => {
+  if(user) return component
+  else return <Redirect to='/'/>
+}
+
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
 
-  const blogFormRef = useRef()
+  const dispatch = useDispatch()
 
-  const showError = message => {
-    setErrorMessage(message)
-    setTimeout(() => {
-      setErrorMessage(null)
-    }, 5000)
-  }
-
-  useEffect(() => {
-    blogService.getAll().then(blogs => {
-      let fixedBlogs = blogs.map(b => ({ ...b, user: b.user.id }))
-      setBlogs(fixedBlogs)
-    }
-
-    )
-  }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      dispatch(login(user))
       blogService.setToken(user.token)
     }
+  }, [dispatch])
+
+
+  let [users, setUsers] = useState([])
+
+
+  useEffect(() => {
+    userService.getAll().then(newUsers => {
+      setUsers(newUsers)
+    })
   }, [])
 
-  const addLike = blog => {
-    const updatedBlog = { ...blog, likes: blog.likes + 1 }
-    blogService
-      .update(updatedBlog)
-      .then(returnedBlog => {
-        setBlogs(blogs
-          .map(b => (b.id !== updatedBlog.id ? b : returnedBlog)))
 
-
-      })
-  }
-
-  const removeBlog = blog => {
-    if (window.confirm('Would you like to delete the blog ' + blog.title)) {
-      blogService
-        .deleteBlog(blog)
-        .then(() => {
-          setBlogs(blogs
-            .filter(b => b.id !== blog.id))
-        })
+  useEffect(() => {
+    blogService.getAll().then(blogs => {
+      let fixedBlogs = blogs.map(b => ({ ...b, user: b.user.id }))
+      dispatch(initializeBlogs(fixedBlogs))
     }
 
-  }
+    )
+  }, [dispatch])
 
-
-  //let sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
-
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedNoteappUser')
-    setUser(null)
-  }
+  const user = useSelector(({ user }) => user)
+  const errorMessage = useSelector(state => state.notification)
+  const blogs = useSelector(({ blogs }) => blogs)
 
   const header = (user === null
     ? 'WELCOME TO THE BLOGOSPHERE'
     : 'Blogs')
-  return (
-    <div>
 
-      <h1>{header}</h1>
-      <Notification message={errorMessage} />
-      {user === null
-        ?
-        <Toggleable buttonLabel='log in'>
-          <LoginForm {...{ setUser, showError }} />
-        </Toggleable>
-        :
-        <div>
-          <p>{user.name} logged-in
-            <button style={{ marginLeft: '5px' }} onClick={() => handleLogout()}>
-              logout
-            </button>
-
-          </p>
-
-          <Toggleable buttonLabel='new blog' ref={blogFormRef} >
-            <BlogForm {...{ setBlogs, blogs, showError }} />
-          </Toggleable>
-          <h2>Current blogs</h2>
-          {blogs.sort((a, b) => b.likes - a.likes)
-            .map(blog => {
-              // eslint-disable-next-line react/jsx-key
-              return (<Blog {...{ key: blog.id, blog, addLike, user, removeBlog }} />)
-            }
-            )}
+  const match = useRouteMatch('/users/:id')
+  const userForRoute = match
+    ? users.find(user => user.id === match.params.id)
+    : null
 
 
 
-        </div>
-      }
+  const blogMatch = useRouteMatch('/blogs/:id')
+  const blogForRoute = blogMatch
+    ? blogs.find(blog => blog.id === blogMatch.params.id)
+    : null
+
+  return(
+    <Container >
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline/>
+        <Grid container justify='center' alignItems='center' spacing={2}
+          style={{ minHeight: '100vh' }}>
+          <Navbar theme={theme} user={user}/>
+          <Notification message={errorMessage} />
+          <Switch>
+            <Route path='/blogs/:id'>
+              <PrivateComponent user={user} component={<BlogDetails blog={blogForRoute}
+                user={user} />}/>
+            </Route>
+            <Route path='/users/:id'>
+              <PrivateComponent user={user} component={<User user={userForRoute}/>}/>
+            </Route>
+            <Route path='/users'>
+              <PrivateComponent user={user} component={<Users/>}/>
+            </Route>
+            <Route path='/'>
+              <Home {...{ user }}/>
+            </Route>
+          </Switch>
+
+        </Grid>
+      </MuiThemeProvider>
 
 
+    </Container>
 
-    </div>
   )
+
 }
 
 export default App
