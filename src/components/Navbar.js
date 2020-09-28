@@ -16,6 +16,10 @@ const useStyles = makeStyles({
   },
   centered: {
     flexGrow: 1
+  },
+  nav: {
+    margin: '0px',
+    padding: 0
   }
 
 })
@@ -39,7 +43,7 @@ const Navbar = ({ user }) => {
 
   return (
 
-    <AppBar color='secondary' position='fixed'>
+    <AppBar color='secondary' position='sticky' className={classes.nav}>
       <Toolbar>
         <Box display='flex' flexGrow={1}>
           <Button color='primary' component={Link} to='/'>

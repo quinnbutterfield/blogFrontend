@@ -16,6 +16,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import Container from '@material-ui/core/Container'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import { Grid } from '@material-ui/core'
+import { initializeUsers } from '../reducers/users'
 
 const theme = createMuiTheme({
   palette: {
@@ -78,6 +79,7 @@ const App = () => {
     blogService.getAll().then(blogs => {
       let fixedBlogs = blogs.map(b => ({ ...b, user: b.user.id }))
       dispatch(initializeBlogs(fixedBlogs))
+      dispatch(initializeUsers())
     }
 
     )
@@ -107,9 +109,11 @@ const App = () => {
     <Container >
       <MuiThemeProvider theme={theme}>
         <CssBaseline/>
+        <Navbar theme={theme} user={user}/>
+
         <Grid container justify='center' alignItems='center' spacing={2}
-          style={{ minHeight: '100vh' }}>
-          <Navbar theme={theme} user={user}/>
+          style={{ minHeight: '80vh' }}>
+
           <Notification message={errorMessage} />
           <Switch>
             <Route path='/blogs/:id'>

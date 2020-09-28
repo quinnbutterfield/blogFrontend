@@ -1,11 +1,10 @@
 import React, { useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
 import { likeBlog, deleteBlog } from '../reducers/blogReducer'
 import Toggleable from './Toggleable'
 import BlogForm from './BlogForm'
 import blogService from './services/blogs'
-import { TableContainer, Table, TableBody, TableRow, TableCell, Paper, Button, Grid, Box, useTheme } from '@material-ui/core'
+import { TableContainer, Table, TableBody, TableRow, TableCell, Paper, Button, Grid, Box, useTheme, Link } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 
 
@@ -33,7 +32,8 @@ const Blogs = ({ showError }) => {
   const StyledPaper = withStyles({
     root: {
       background: theme.palette.primary.light,
-      borderRadius: 3
+      borderRadius: 15,
+      elevation: 10
     }
   })(Paper)
 
@@ -42,6 +42,12 @@ const Blogs = ({ showError }) => {
       borderBottom: 'none'
     }
   })(TableCell)
+
+  const StyleLink = withStyles({
+    root: {
+      color: theme.palette.secondary.main
+    }
+  })(Link)
 
   return (
     <Grid item>
@@ -56,7 +62,7 @@ const Blogs = ({ showError }) => {
                 .map(blog => (
                   <TableRow key={blog.id}>
                     <StyleCell>
-                      <h2><Link to={`/blogs/${blog.id}`}>{blog.title}</Link></h2>
+                      <h2><StyleLink to={`/blogs/${blog.id}`}>{blog.title}</StyleLink></h2>
                     </StyleCell>
                     <StyleCell>
                       Likes: {blog.likes}

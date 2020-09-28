@@ -4,6 +4,7 @@ import { likeBlog, deleteBlog, addComment } from '../reducers/blogReducer'
 import { useHistory } from 'react-router-dom'
 import userService from './services/users'
 import blogService from './services/blogs'
+import { List, ListItem, Paper } from '@material-ui/core'
 
 const BlogDetails = ({ blog, user }) => {
 
@@ -103,12 +104,15 @@ const BlogDetails = ({ blog, user }) => {
           onChange={handleCommentChange}/>
         <button type='submit'>add comment</button>
       </form>
-      <ul>
-        {
-          blog.comments.map((c, index) => {
-            return (<li key={index}>{c}</li>)
-          })}
-      </ul>
+      <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
+        <List>
+          {
+            blog.comments.map((c, index) => {
+              return (<ListItem key={index}>{c}</ListItem>)
+            })}
+        </List>
+      </Paper>
+
     </div>
   )
 }
